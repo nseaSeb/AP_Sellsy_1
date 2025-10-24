@@ -1,0 +1,195 @@
+﻿{
+  "created": "1761304897559",
+  "updated": "1761304897559",
+  "name": "CF company to new invoice",
+  "description": "",
+  "tags": [],
+  "pieces": [
+    "@activepieces/piece-sellsy"
+  ],
+  "template": {
+    "displayName": "CF company to new invoice",
+    "trigger": {
+      "name": "trigger",
+      "valid": true,
+      "displayName": "Invoice Created",
+      "type": "PIECE_TRIGGER",
+      "settings": {
+        "propertySettings": {
+          "auth": {
+            "type": "MANUAL"
+          }
+        },
+        "pieceName": "@activepieces/piece-sellsy",
+        "pieceVersion": "~0.0.12",
+        "input": {
+          "auth": "{{connections['wnekEwO5FcxzJoqjCnfbA']}}"
+        },
+        "sampleData": {},
+        "triggerName": "invoiceCreated"
+      },
+      "nextAction": {
+        "name": "step_1",
+        "skip": false,
+        "type": "PIECE",
+        "valid": true,
+        "settings": {
+          "input": {
+            "url": {
+              "url": "https://api.sellsy.com/v2/custom-fields/search"
+            },
+            "auth": "{{connections['wnekEwO5FcxzJoqjCnfbA']}}",
+            "body": {
+              "filters": {
+                "related_object": "client"
+              }
+            },
+            "method": "POST",
+            "headers": {},
+            "failsafe": false,
+            "queryParams": {},
+            "response_is_binary": false
+          },
+          "pieceName": "@activepieces/piece-sellsy",
+          "actionName": "custom_api_call_to_v2",
+          "sampleData": {},
+          "pieceVersion": "~0.0.12",
+          "propertySettings": {
+            "url": {
+              "type": "MANUAL",
+              "schema": {
+                "url": {
+                  "type": "SHORT_TEXT",
+                  "required": true,
+                  "description": "You can either use the full URL or the relative path to the base URL\ni.e https://api.sellsy.com/v2/resource or /resource",
+                  "displayName": "URL",
+                  "defaultValue": "https://api.sellsy.com/v2/"
+                }
+              }
+            },
+            "auth": {
+              "type": "MANUAL"
+            },
+            "body": {
+              "type": "MANUAL"
+            },
+            "method": {
+              "type": "MANUAL"
+            },
+            "headers": {
+              "type": "MANUAL"
+            },
+            "failsafe": {
+              "type": "MANUAL"
+            },
+            "queryParams": {
+              "type": "MANUAL"
+            }
+          },
+          "errorHandlingOptions": {
+            "retryOnFailure": {
+              "value": false
+            },
+            "continueOnFailure": {
+              "value": false
+            }
+          }
+        },
+        "nextAction": {
+          "name": "step_2",
+          "skip": false,
+          "type": "CODE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "data": "{{step_1['body']['data']}}"
+            },
+            "sampleData": {},
+            "sourceCode": {
+              "code": "export const code = async (inputs) => {\n  return inputs.data.map(item => \"embed[]=cf.\" + item.id).join(\"&\");\n};",
+              "packageJson": "{}"
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
+            }
+          },
+          "nextAction": {
+            "name": "step_3",
+            "skip": false,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "url": {
+                  "url": "https://api.sellsy.com/v2/companies/{{trigger['company_id']}}?{{step_2}}"
+                },
+                "auth": "{{connections['wnekEwO5FcxzJoqjCnfbA']}}",
+                "method": "GET",
+                "headers": {},
+                "failsafe": false,
+                "queryParams": {},
+                "response_is_binary": false
+              },
+              "pieceName": "@activepieces/piece-sellsy",
+              "actionName": "custom_api_call_to_v2",
+              "sampleData": {},
+              "pieceVersion": "~0.0.12",
+              "propertySettings": {
+                "url": {
+                  "type": "MANUAL",
+                  "schema": {
+                    "url": {
+                      "type": "SHORT_TEXT",
+                      "required": true,
+                      "description": "You can either use the full URL or the relative path to the base URL\ni.e https://api.sellsy.com/v2/resource or /resource",
+                      "displayName": "URL",
+                      "defaultValue": "https://api.sellsy.com/v2/"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "MANUAL"
+                },
+                "method": {
+                  "type": "MANUAL"
+                },
+                "headers": {
+                  "type": "MANUAL"
+                },
+                "failsafe": {
+                  "type": "MANUAL"
+                },
+                "queryParams": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "displayName": "API v2 – Custom Request"
+          },
+          "displayName": "Custom Javascript Code"
+        },
+        "displayName": "API v2 – Custom Request"
+      }
+    },
+    "valid": true,
+    "agentIds": [],
+    "connectionIds": [
+      "wnekEwO5FcxzJoqjCnfbA"
+    ],
+    "schemaVersion": "7"
+  },
+  "blogUrl": ""
+}
